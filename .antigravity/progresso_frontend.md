@@ -1,6 +1,6 @@
 # Progresso Frontend — Toque Aquela
 
-Última atualização: 2026-05-16 (sessão 3)
+Última atualização: 2026-05-16 (sessão 4)
 
 ## Fundação ✅
 
@@ -30,9 +30,9 @@
 | `/artista/cadastro` | ✅ Feito | POST /v1/artists → JWT em sessionStorage → dashboard |
 | `/artista/login` | ✅ Feito | POST /v1/artists/login → JWT em sessionStorage → dashboard |
 | `/artista/dashboard` | ✅ Feito | Polling 5s, show ativo via GET /shows/me, mark-as-played, encerrar show |
-| `/artista/repertorio` | 🔴 Stub | CRUD músicas (nome, artista original, estilo) |
+| `/artista/repertorio` | ✅ Feito | CRUD músicas (nome, artista original, estilo) + toggle disponibilidade |
 | `/artista/show/novo` | 🔴 Stub | Criar show + CTA "Conectar Mercado Pago" (RN15, não bloqueante) |
-| `/artista/perfil` | 🔴 Stub | Redes sociais + conta de pagamento |
+| `/artista/perfil` | ✅ Feito | Nome editável, 6 redes sociais, conta MP connect/disconnect |
 
 ### Admin
 
@@ -58,6 +58,7 @@
 | Show público | `PublicShow`, `PublicSong`, `CreateRequestBody`, `CreateRequestResponse` |
 | Dashboard | `ActiveShow`, `ShowRequest`, `ArtistSong` |
 | Auth | `RegisterRequest`, `RegisterResponse`, `LoginRequest`, `LoginResponse` |
+| Perfil | `ArtistProfile`, `UpdateProfileRequest`, `StartPaymentConnectionResponse` |
 
 ---
 
@@ -67,6 +68,8 @@
 |----------|---------|--------|
 | `GET /v1/shows/me` | `show.controller.ts` + `get-active-show.use-case.ts` | Dashboard precisa saber se há show ativo |
 | `GET /v1/shows/:showId` (público) | `public-show.controller.ts` + `get-public-show.use-case.ts` | Página pública `/show/:showId` |
+| `GET /v1/artists/me` | `artist.controller.ts` + `update-artist-profile.use-case.ts` | Perfil do artista autenticado |
+| `PATCH /v1/artists/me` | `artist.controller.ts` + `update-artist-profile.use-case.ts` | Atualizar nome e sociais |
 
 ---
 
@@ -76,9 +79,9 @@
 2. ✅ `/artista/cadastro` + `/artista/login` — auth completa
 3. ✅ `<ProtectedRoute>` — guard reutilizável
 4. ✅ `/artista/dashboard` — painel de pedidos com polling
-5. 🔜 `/artista/show/novo` — criar show + onboarding MP (RN15)
-6. 🔜 `/artista/repertorio` — CRUD de músicas
-7. 🔜 `/artista/perfil` — redes sociais + conta de pagamento
+5. ✅ `/artista/repertorio` — CRUD de músicas + toggle disponibilidade
+6. ✅ `/artista/perfil` — nome, redes sociais, conta de pagamento
+7. 🔜 `/artista/show/novo` — criar show + onboarding MP (RN15)
 8. 🔜 `/admin` — painel admin restrito
 
 ---

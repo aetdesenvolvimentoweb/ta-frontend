@@ -103,6 +103,27 @@ export interface AddSongRequest {
   styleName: string
 }
 
+// ---------- Perfil do artista ----------
+
+export interface ArtistProfile {
+  id: string
+  name: string
+  email: string
+  socials: Record<string, string>
+  canReceiveTips: boolean
+  paymentGateway?: string
+}
+
+export interface UpdateProfileRequest {
+  name?: string
+  socials?: Record<string, string>
+}
+
+export interface StartPaymentConnectionResponse {
+  authorizeUrl: string
+  state: string
+}
+
 // ---------- Erros ----------
 
 export interface ApiErrorBody {

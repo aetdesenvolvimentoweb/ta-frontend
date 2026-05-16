@@ -51,6 +51,12 @@ function TopBar({ onLogout }: { onLogout: () => void }) {
         >
           Repertório
         </Link>
+        <Link
+          to="/artista/perfil"
+          className="text-xs text-zinc-400 hover:text-white transition-colors"
+        >
+          Perfil
+        </Link>
         <button
           onClick={onLogout}
           className="text-xs text-zinc-500 hover:text-white transition-colors"
