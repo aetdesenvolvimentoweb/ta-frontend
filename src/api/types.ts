@@ -66,6 +66,17 @@ export interface ArtistSong {
 
 // ---------- Autenticação ----------
 
+export interface RegisterRequest {
+  name: string
+  email: string
+  password: string
+}
+
+export interface RegisterResponse {
+  artist: { id: string; name: string; email: string; isPremium: boolean }
+  token: string
+}
+
 export interface LoginRequest {
   email: string
   password: string
