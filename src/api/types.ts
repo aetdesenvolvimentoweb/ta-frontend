@@ -36,6 +36,19 @@ export interface CreateRequestResponse {
   payment?: { checkoutUrl?: string }
 }
 
+// ---------- Autenticação ----------
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface LoginResponse {
+  message: string
+  artist: { id: string; name: string; email: string }
+  token: string
+}
+
 // ---------- Erros ----------
 
 export interface ApiErrorBody {
