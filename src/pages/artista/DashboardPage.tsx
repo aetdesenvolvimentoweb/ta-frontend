@@ -44,12 +44,20 @@ function TopBar({ onLogout }: { onLogout: () => void }) {
   return (
     <header className="flex items-center justify-between px-4 py-4 border-b border-zinc-800">
       <span className="font-semibold text-sm">Toque Aquela</span>
-      <button
-        onClick={onLogout}
-        className="text-xs text-zinc-500 hover:text-white transition-colors"
-      >
-        Sair
-      </button>
+      <div className="flex items-center gap-4">
+        <Link
+          to="/artista/repertorio"
+          className="text-xs text-zinc-400 hover:text-white transition-colors"
+        >
+          Repertório
+        </Link>
+        <button
+          onClick={onLogout}
+          className="text-xs text-zinc-500 hover:text-white transition-colors"
+        >
+          Sair
+        </button>
+      </div>
     </header>
   )
 }

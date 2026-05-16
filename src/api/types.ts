@@ -88,6 +88,21 @@ export interface LoginResponse {
   token: string
 }
 
+// ---------- Estilos ----------
+
+export interface Style {
+  id: string
+  name: string
+}
+
+// ---------- Repertório ----------
+
+export interface AddSongRequest {
+  title: string
+  originalArtist: string
+  styleName: string
+}
+
 // ---------- Erros ----------
 
 export interface ApiErrorBody {
