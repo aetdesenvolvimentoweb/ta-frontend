@@ -36,6 +36,34 @@ export interface CreateRequestResponse {
   payment?: { checkoutUrl?: string }
 }
 
+// ---------- Dashboard do artista ----------
+
+export interface ActiveShow {
+  id: string
+  artistId: string
+  startTime: string
+  durationHours: number
+  status: 'active' | 'finished' | 'expired'
+}
+
+export interface ShowRequest {
+  id: string
+  songId: string
+  customerName: string
+  message?: string
+  tipAmountInCents: number
+  status: 'pending' | 'played' | 'cancelled'
+  createdAt: string
+}
+
+export interface ArtistSong {
+  id: string
+  title: string
+  originalArtist: string
+  styleId: string | null
+  isAvailable: boolean
+}
+
 // ---------- Autenticação ----------
 
 export interface LoginRequest {
