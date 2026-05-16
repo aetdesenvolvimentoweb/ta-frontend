@@ -1,6 +1,6 @@
 # Progresso Frontend — Toque Aquela
 
-Última atualização: 2026-05-15
+Última atualização: 2026-05-15 (sessão 2)
 
 ## Fundação ✅
 
@@ -20,7 +20,7 @@
 
 | Rota | Status | Observações |
 |------|--------|-------------|
-| `/show/:showId` | 🔴 Stub | **Próximo passo** — core do produto (repertório + pedido + gorjeta PIX) |
+| `/show/:showId` | ✅ Feito | Repertório agrupado por estilo, modal de pedido, gorjeta PIX, redirect checkout |
 
 ### Fluxo Artista
 
