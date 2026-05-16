@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@layer components {
+  .input {
+    @apply w-full rounded-xl bg-zinc-800 border border-zinc-700 px-3 py-2.5 text-sm text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors;
+  }
+}
