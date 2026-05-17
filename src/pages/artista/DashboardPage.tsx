@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { QRCodeSVG } from 'qrcode.react'
 import { api, ApiError } from '@/api/client'
 import type { ActiveShow, ShowRequest, ArtistSong } from '@/api/types'
 
@@ -125,8 +126,9 @@ function ActiveShowView({
     mutationFn: () =>
       api.post(`/v1/shows/${show.id}/finish`, {}, { auth: true }),
     onSuccess: () => {
+      qc.setQueryData(['active-show'], null)
       qc.invalidateQueries({ queryKey: ['active-show'] })
-      navigate('/artista/show/novo', { replace: true })
+      navigate('/artista/dashboard', { replace: true })
     },
   })
 
@@ -176,6 +178,9 @@ function ActiveShowView({
         <p className="text-red-400 text-sm">{finishMutation.error?.message}</p>
       )}
 
+      {/* QR Code do show */}
+      <ShowQRCode showId={show.id} />
+
       {/* Pedidos pendentes */}
       <section className="space-y-3">
         <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
@@ -221,6 +226,36 @@ function ActiveShowView({
         </section>
       )}
     </div>
+  )
+}
+
+// ─── QR Code do show ─────────────────────────────────────────────────────────
+
+function ShowQRCode({ showId }: { showId: string }) {
+  const showUrl = `${window.location.origin}/show/${showId}`
+  const [copied, setCopied] = useState(false)
+
+  function copyLink() {
+    navigator.clipboard.writeText(showUrl)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 flex flex-col items-center gap-3">
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest self-start">
+        QR Code do show
+      </p>
+      <div className="bg-white p-3 rounded-xl">
+        <QRCodeSVG value={showUrl} size={180} />
+      </div>
+      <button
+        onClick={copyLink}
+        className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 text-sm font-medium transition-colors"
+      >
+        {copied ? '✓ Link copiado!' : 'Copiar link'}
+      </button>
+    </section>
   )
 }
 
