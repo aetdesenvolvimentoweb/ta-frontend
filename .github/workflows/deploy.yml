@@ -27,6 +27,8 @@ jobs:
 
       - name: Build
         run: bun run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler@4 pages deploy dist --project-name toqueaquela --branch main
