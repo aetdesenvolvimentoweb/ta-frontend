@@ -78,6 +78,7 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
   const navigate = useNavigate()
   const qc = useQueryClient()
   const [durationHours, setDurationHours] = useState(4)
+  const [scheduledStartTime, setScheduledStartTime] = useState('')
 
   const mutation = useMutation<CreateShowResponse, ApiError, CreateShowRequest>({
     mutationFn: body => api.post<CreateShowResponse>('/v1/shows', body, { auth: true }),
@@ -87,10 +88,20 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
     },
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    mutation.mutate({ durationHours })
+    mutation.mutate({
+      durationHours,
+      scheduledStartTime: scheduledStartTime ? new Date(scheduledStartTime).toISOString() : undefined,
+    })
   }
+
+  // Valor mínimo do datetime-local: agora + 1 minuto
+  const minDatetime = new Date(Date.now() + 60_000).toISOString().slice(0, 16)
+  // Valor máximo: agora + 24h
+  const maxDatetime = new Date(Date.now() + 24 * 60 * 60_000).toISOString().slice(0, 16)
+
+  const isScheduled = !!scheduledStartTime
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -127,6 +138,26 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
           />
           <p className="text-xs text-zinc-600">Entre 1 e 24 horas. O show expira automaticamente ao fim deste período.</p>
         </div>
+
+        <div className="space-y-1.5">
+          <label htmlFor="scheduled-start" className="text-xs text-zinc-500">
+            Horário de início (opcional)
+          </label>
+          <input
+            id="scheduled-start"
+            type="datetime-local"
+            min={minDatetime}
+            max={maxDatetime}
+            value={scheduledStartTime}
+            onChange={e => setScheduledStartTime(e.target.value)}
+            className="input"
+          />
+          <p className="text-xs text-zinc-600">
+            {isScheduled
+              ? 'O QR Code já estará disponível, mas o público só poderá pedir músicas a partir deste horário.'
+              : 'Deixe em branco para iniciar agora.'}
+          </p>
+        </div>
       </section>
 
       {mutation.isError && (
@@ -138,7 +169,7 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
         disabled={mutation.isPending}
         className="w-full py-3 rounded-xl bg-white text-zinc-950 font-semibold text-sm hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
       >
-        {mutation.isPending ? 'Iniciando…' : 'Iniciar show'}
+        {mutation.isPending ? 'Salvando…' : isScheduled ? 'Agendar show' : 'Iniciar show agora'}
       </button>
     </form>
   )

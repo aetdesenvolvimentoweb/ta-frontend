@@ -8,7 +8,7 @@ export interface PublicSong {
 }
 
 export interface PublicShow {
-  show: { id: string; status: string }
+  show: { id: string; status: string; startTime: string }
   artist: {
     id: string
     name: string
@@ -128,6 +128,7 @@ export interface StartPaymentConnectionResponse {
 
 export interface CreateShowRequest {
   durationHours: number
+  scheduledStartTime?: string
 }
 
 export interface CreateShowResponse {

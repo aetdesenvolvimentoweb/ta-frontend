@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { api, ApiError } from '@/api/client'
@@ -18,6 +18,7 @@ export default function ShowPage() {
   if (isError || !data) return <PageShell><ErrorState error={error} /></PageShell>
 
   const isExpiredOrFinished = data.show.status !== 'active'
+  const isScheduled = new Date(data.show.startTime) > new Date()
 
   return (
     <PageShell>
@@ -26,6 +27,8 @@ export default function ShowPage() {
         <div className="mt-8 text-center text-zinc-400 text-sm">
           Este show já foi encerrado. Obrigado por participar!
         </div>
+      ) : isScheduled ? (
+        <ScheduledState startTime={data.show.startTime} />
       ) : (
         <SongList
           songs={data.songs}
@@ -73,6 +76,40 @@ function ArtistHeader({ artist }: { artist: PublicShow['artist'] }) {
         </div>
       )}
     </header>
+  )
+}
+
+// ─── Show agendado (countdown) ────────────────────────────────────────────────
+
+function ScheduledState({ startTime }: { startTime: string }) {
+  const [remaining, setRemaining] = useState(() => Math.max(0, new Date(startTime).getTime() - Date.now()))
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      const diff = Math.max(0, new Date(startTime).getTime() - Date.now())
+      setRemaining(diff)
+    }, 1000)
+    return () => clearInterval(id)
+  }, [startTime])
+
+  const h = Math.floor(remaining / 3_600_000)
+  const m = Math.floor((remaining % 3_600_000) / 60_000)
+  const s = Math.floor((remaining % 60_000) / 1000)
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  return (
+    <div className="mt-12 flex flex-col items-center gap-4 text-center">
+      <p className="text-zinc-400 text-sm">O show começa em</p>
+      <p className="text-4xl font-bold tabular-nums tracking-tight">
+        {h > 0 && <>{pad(h)}:</>}{pad(m)}:{pad(s)}
+      </p>
+      <p className="text-zinc-500 text-xs">
+        às {new Date(startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+      </p>
+      <p className="text-zinc-600 text-xs mt-2">
+        Fique por aqui — o repertório aparecerá quando o show iniciar.
+      </p>
+    </div>
   )
 }
 

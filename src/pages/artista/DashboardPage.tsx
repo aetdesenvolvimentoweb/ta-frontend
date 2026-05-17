@@ -140,12 +140,25 @@ function ActiveShowView({
       {/* Cabeçalho do show */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-xs text-emerald-400 font-semibold uppercase tracking-widest">
-            Ao vivo
-          </p>
-          <p className="text-sm text-zinc-400 mt-0.5">
-            Iniciado às {formatTime(show.startTime)} · {show.durationHours}h
-          </p>
+          {new Date(show.startTime) > new Date() ? (
+            <>
+              <p className="text-xs text-yellow-400 font-semibold uppercase tracking-widest">
+                Agendado
+              </p>
+              <p className="text-sm text-zinc-400 mt-0.5">
+                Começa às {formatTime(show.startTime)} · {show.durationHours}h
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-emerald-400 font-semibold uppercase tracking-widest">
+                Ao vivo
+              </p>
+              <p className="text-sm text-zinc-400 mt-0.5">
+                Iniciado às {formatTime(show.startTime)} · {show.durationHours}h
+              </p>
+            </>
+          )}
         </div>
 
         {confirmFinish ? (
