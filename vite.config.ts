@@ -23,6 +23,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
+      workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
+      },
       manifest: {
         name: 'Toque Aquela',
         short_name: 'Toque Aquela',
