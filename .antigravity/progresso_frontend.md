@@ -1,6 +1,6 @@
 # Progresso Frontend — Toque Aquela
 
-Última atualização: 2026-05-16 (sessão 4)
+Última atualização: 2026-05-17 (sessão 5)
 
 ## Fundação ✅
 
@@ -31,7 +31,7 @@
 | `/artista/login` | ✅ Feito | POST /v1/artists/login → JWT em sessionStorage → dashboard |
 | `/artista/dashboard` | ✅ Feito | Polling 5s, show ativo via GET /shows/me, mark-as-played, encerrar show |
 | `/artista/repertorio` | ✅ Feito | CRUD músicas (nome, artista original, estilo) + toggle disponibilidade |
-| `/artista/show/novo` | 🔴 Stub | Criar show + CTA "Conectar Mercado Pago" (RN15, não bloqueante) |
+| `/artista/show/novo` | ✅ Feito | Formulário + CTA "Conectar Mercado Pago" (RN15, não bloqueante) |
 | `/artista/perfil` | ✅ Feito | Nome editável, 6 redes sociais, conta MP connect/disconnect |
 
 ### Admin
@@ -81,7 +81,7 @@
 4. ✅ `/artista/dashboard` — painel de pedidos com polling
 5. ✅ `/artista/repertorio` — CRUD de músicas + toggle disponibilidade
 6. ✅ `/artista/perfil` — nome, redes sociais, conta de pagamento
-7. 🔜 `/artista/show/novo` — criar show + onboarding MP (RN15)
+7. ✅ `/artista/show/novo` — criar show + onboarding MP (RN15)
 8. 🔜 `/admin` — painel admin restrito
 
 ---
@@ -91,3 +91,9 @@
 - Build: `bun run build` → `dist/`
 - Deploy: `wrangler pages deploy` (workflow em `.github/workflows/deploy.yml`)
 - SPA routing no Cloudflare Pages: adicionar `public/_redirects` com `/* /index.html 200` se necessário
+
+## Estabilidade de Infra (sessão 5)
+
+Erros intermitentes de comunicação com o backend/banco foram resolvidos no lado do `ta-backend`:
+- Driver de banco trocado para `@neondatabase/serverless` HTTP em produção (sem pool que fica obsoleto quando o Neon pausa)
+- UptimeRobot configurado para pingar o Render a cada 5 min (elimina cold starts no free tier)
