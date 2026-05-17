@@ -124,6 +124,20 @@ export interface StartPaymentConnectionResponse {
   state: string
 }
 
+// ---------- Criar show ----------
+
+export interface CreateShowRequest {
+  durationHours: number
+}
+
+export interface CreateShowResponse {
+  id: string
+  artistId: string
+  startTime: string
+  durationHours: number
+  status: string
+}
+
 // ---------- Erros ----------
 
 export interface ApiErrorBody {
