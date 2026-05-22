@@ -11,9 +11,14 @@ export default function LoginPage() {
 
   const mutation = useMutation<LoginResponse, ApiError, LoginRequest>({
     mutationFn: body => api.post<LoginResponse>('/v1/artists/login', body),
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       sessionStorage.setItem('jwt', data.token)
-      navigate('/artista/dashboard', { replace: true })
+      try {
+        await api.get('/v1/admin/me', { auth: true })
+        navigate('/admin', { replace: true })
+      } catch {
+        navigate('/artista/dashboard', { replace: true })
+      }
     },
   })
 
