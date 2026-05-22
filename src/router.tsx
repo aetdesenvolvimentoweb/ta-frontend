@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
+import { AdminRoute } from '@/components/AdminRoute'
 import RootPage from '@/pages/RootPage'
 import ShowPage from '@/pages/public/ShowPage'
 import LoginPage from '@/pages/artista/LoginPage'
@@ -25,6 +26,11 @@ export const router = createBrowserRouter([
       { path: '/artista/perfil', element: <PerfilPage /> },
     ],
   },
-  { path: '/admin', element: <AdminPage /> },
+  {
+    element: <AdminRoute />,
+    children: [
+      { path: '/admin', element: <AdminPage /> },
+    ],
+  },
   { path: '*', element: <NotFoundPage /> },
 ])

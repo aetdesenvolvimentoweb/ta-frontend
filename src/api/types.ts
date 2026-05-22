@@ -139,6 +139,22 @@ export interface CreateShowResponse {
   status: string
 }
 
+// ---------- Admin ----------
+
+export interface AppMetrics {
+  totalAppRevenue: number
+  totalArtistsRevenue: number
+  totalVolumeTransacted: number
+  appCommissionPercent: number
+  topSongsByRequestCount: { title: string; count: number }[]
+  topArtistsByRevenue: { name: string; revenue: number }[]
+}
+
+export interface MergeStylesRequest {
+  sourceId: string
+  targetId: string
+}
+
 // ---------- Erros ----------
 
 export interface ApiErrorBody {
