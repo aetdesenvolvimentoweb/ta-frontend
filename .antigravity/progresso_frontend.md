@@ -1,6 +1,6 @@
 # Progresso Frontend — Toque Aquela
 
-Última atualização: 2026-05-17 (sessão 5)
+Última atualização: 2026-05-22 (sessão 6)
 
 ## Fundação ✅
 
@@ -9,8 +9,9 @@
 - [x] `src/api/client.ts` — fetch tipado com `ApiError`, `credentials: include`, auth opt-in
 - [x] `src/lib/queryClient.ts` — QueryClient singleton
 - [x] `src/router.tsx` — rotas com `createBrowserRouter` (atualizado a cada página)
-- [x] `src/App.tsx` — providers: `QueryClientProvider` + `RouterProvider` + DevTools
+- [x] `src/App.tsx` — providers: `QueryClientProvider` + `ToastProvider` + `RouterProvider` + DevTools
 - [x] Stubs de todas as páginas criados (compilam, build passa, 0 erros TS)
+- [x] **Tooling:** Biome v2 (linting + formatting + organizeImports, aspas simples, sem semicolons) substitui ESLint. Lefthook executa `tsc + biome --write` no pre-commit. commitlint valida mensagens no commit-msg.
 
 ---
 
@@ -38,16 +39,15 @@
 
 | Rota | Status | Observações |
 |------|--------|-------------|
-| `/admin` | 🔴 Stub | Whitelist de emails + métricas (RN12) |
+| `/admin` | ✅ Feito | Tabs Métricas (GET /v1/admin/metrics) + Estilos (criar + merge); guard `<AdminRoute>` |
 
 ---
 
 ## Componentes Compartilhados
 
 - [x] `<ProtectedRoute>` — guard JWT para rotas do artista (Outlet pattern)
-- [ ] Layout artista — nav bottom mobile-first (pendente até ter mais páginas)
-- [ ] `<AdminRoute>` — guard para `/admin`
-- [ ] Toast / feedback de ação global
+- [x] `<AdminRoute>` — guard JWT para `/admin` (whitelist validada pelo servidor)
+- [x] `<ToastProvider>` + `useToast()` — notificações globais via Context, auto-dismiss 3,5s
 
 ---
 
@@ -59,6 +59,7 @@
 | Dashboard | `ActiveShow`, `ShowRequest`, `ArtistSong` |
 | Auth | `RegisterRequest`, `RegisterResponse`, `LoginRequest`, `LoginResponse` |
 | Perfil | `ArtistProfile`, `UpdateProfileRequest`, `StartPaymentConnectionResponse` |
+| Admin | `AppMetrics`, `MergeStylesRequest` |
 
 ---
 
@@ -70,6 +71,7 @@
 | `GET /v1/shows/:showId` (público) | `public-show.controller.ts` + `get-public-show.use-case.ts` | Página pública `/show/:showId` |
 | `GET /v1/artists/me` | `artist.controller.ts` + `update-artist-profile.use-case.ts` | Perfil do artista autenticado |
 | `PATCH /v1/artists/me` | `artist.controller.ts` + `update-artist-profile.use-case.ts` | Atualizar nome e sociais |
+| `GET /v1/admin/me` | `admin.controller.ts` | Probe pós-login: redireciona admin para `/admin`, artista para `/artista/dashboard` |
 
 ---
 
@@ -82,7 +84,9 @@
 5. ✅ `/artista/repertorio` — CRUD de músicas + toggle disponibilidade
 6. ✅ `/artista/perfil` — nome, redes sociais, conta de pagamento
 7. ✅ `/artista/show/novo` — criar show + onboarding MP (RN15)
-8. 🔜 `/admin` — painel admin restrito
+8. ✅ `/admin` — painel admin com métricas + estilos + guard `<AdminRoute>`
+
+**Frontend 100% feature-complete para MVP.**
 
 ---
 
@@ -97,3 +101,11 @@
 Erros intermitentes de comunicação com o backend/banco foram resolvidos no lado do `ta-backend`:
 - Driver de banco trocado para `@neondatabase/serverless` HTTP em produção (sem pool que fica obsoleto quando o Neon pausa)
 - UptimeRobot configurado para pingar o Render a cada 5 min (elimina cold starts no free tier)
+
+## Débito Técnico — Acessibilidade (sessão 6)
+
+46 warnings Biome a11y no frontend — código pré-existente, não bloqueiam commits:
+- `useButtonType`: botões sem `type` dentro de `<form>` → prioridade média (bug funcional potencial)
+- `noLabelWithoutControl`: `<label>` sem `htmlFor` em todos os formulários → prioridade baixa
+- `noSvgWithoutTitle`, `noAutofocus`, `useKeyWithClickEvents`, `noStaticElementInteractions` → prioridade baixa
+- **Ação recomendada:** endereçar num pass dedicado antes do launch público

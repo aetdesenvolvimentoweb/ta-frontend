@@ -12,6 +12,7 @@ Progresso atual: `./progresso_frontend.md`
 - **Server state:** @tanstack/react-query@5 (polling + cache)
 - **PWA:** `vite-plugin-pwa` (Workbox, `registerType: autoUpdate`)
 - **Deploy:** Cloudflare Pages (SPA estático, `dist/` servido via `wrangler pages deploy`)
+- **Qualidade:** Biome v2 (linting + formatting + organizeImports), Lefthook (pre-commit), commitlint (commit-msg)
 
 ## Decisões de Arquitetura
 
@@ -28,6 +29,8 @@ src/
     types.ts            ← interfaces de request/response por domínio
   components/
     ProtectedRoute.tsx  ← guard JWT (Outlet pattern do react-router v7)
+    AdminRoute.tsx      ← guard JWT para /admin (whitelist validada pelo servidor)
+    Toast.tsx           ← ToastProvider + useToast() — notificações globais via Context
   lib/
     queryClient.ts      ← QueryClient singleton (staleTime: 10s, retry: 1)
   pages/
@@ -60,7 +63,7 @@ src/
 /artista/repertorio      → Gerenciamento de músicas               [JWT]
 /artista/show/novo       → Criar show + onboarding de pagamento   [JWT]
 /artista/perfil          → Redes sociais + conta de pagamento      [JWT]
-/admin                   → Painel admin (whitelist + métricas)
+/admin                   → Painel admin: métricas globais + gestão de estilos  [JWT + whitelist]
 ```
 
 ## Comunicação com o Backend
