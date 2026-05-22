@@ -1,12 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type {
   ArtistProfile,
   StartPaymentConnectionResponse,
   UpdateProfileRequest,
 } from '@/api/types'
+import { useToast } from '@/components/Toast'
 
 const SOCIAL_PLATFORMS: { key: string; label: string; placeholder: string }[] = [
   { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/...' },
@@ -50,6 +51,24 @@ function Header() {
 // ─── Conteúdo principal ───────────────────────────────────────────────────────
 
 function ProfileContent() {
+  const qc = useQueryClient()
+  const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const { showToast } = useToast()
+
+  useEffect(() => {
+    const status = searchParams.get('status')
+    if (!status) return
+    if (status === 'connected') {
+      showToast('Conta do Mercado Pago conectada!', 'success')
+      qc.invalidateQueries({ queryKey: ['artist-profile'] })
+    } else if (status === 'error') {
+      const reason = searchParams.get('reason') ?? 'Erro desconhecido'
+      showToast(`Falha ao conectar: ${reason}`, 'error')
+    }
+    navigate('/artista/perfil', { replace: true })
+  }, [searchParams, navigate, showToast, qc])
+
   const {
     data: profile,
     isLoading,
