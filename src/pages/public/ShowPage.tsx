@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
-import type { PublicShow, PublicSong, CreateRequestBody, CreateRequestResponse } from '@/api/types'
+import { ApiError, api } from '@/api/client'
+import type { CreateRequestBody, CreateRequestResponse, PublicShow, PublicSong } from '@/api/types'
 
 export default function ShowPage() {
   const { showId } = useParams<{ showId: string }>()
@@ -14,8 +14,18 @@ export default function ShowPage() {
     retry: 1,
   })
 
-  if (isLoading) return <PageShell><LoadingState /></PageShell>
-  if (isError || !data) return <PageShell><ErrorState error={error} /></PageShell>
+  if (isLoading)
+    return (
+      <PageShell>
+        <LoadingState />
+      </PageShell>
+    )
+  if (isError || !data)
+    return (
+      <PageShell>
+        <ErrorState error={error} />
+      </PageShell>
+    )
 
   const isExpiredOrFinished = data.show.status !== 'active'
   const isScheduled = new Date(data.show.startTime) > new Date()
@@ -30,11 +40,7 @@ export default function ShowPage() {
       ) : isScheduled ? (
         <ScheduledState startTime={data.show.startTime} />
       ) : (
-        <SongList
-          songs={data.songs}
-          showId={showId!}
-          canReceiveTips={data.artist.canReceiveTips}
-        />
+        <SongList songs={data.songs} showId={showId!} canReceiveTips={data.artist.canReceiveTips} />
       )}
     </PageShell>
   )
@@ -45,9 +51,7 @@ export default function ShowPage() {
 function PageShell({ children }: { children: React.ReactNode }) {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-lg mx-auto px-4 pb-20">
-        {children}
-      </div>
+      <div className="max-w-lg mx-auto px-4 pb-20">{children}</div>
     </main>
   )
 }
@@ -82,7 +86,9 @@ function ArtistHeader({ artist }: { artist: PublicShow['artist'] }) {
 // ─── Show agendado (countdown) ────────────────────────────────────────────────
 
 function ScheduledState({ startTime }: { startTime: string }) {
-  const [remaining, setRemaining] = useState(() => Math.max(0, new Date(startTime).getTime() - Date.now()))
+  const [remaining, setRemaining] = useState(() =>
+    Math.max(0, new Date(startTime).getTime() - Date.now())
+  )
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -101,7 +107,8 @@ function ScheduledState({ startTime }: { startTime: string }) {
     <div className="mt-12 flex flex-col items-center gap-4 text-center">
       <p className="text-zinc-400 text-sm">O show começa em</p>
       <p className="text-4xl font-bold tabular-nums tracking-tight">
-        {h > 0 && <>{pad(h)}:</>}{pad(m)}:{pad(s)}
+        {h > 0 && <>{pad(h)}:</>}
+        {pad(m)}:{pad(s)}
       </p>
       <p className="text-zinc-500 text-xs">
         às {new Date(startTime).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
@@ -115,7 +122,11 @@ function ScheduledState({ startTime }: { startTime: string }) {
 
 // ─── Lista de músicas ─────────────────────────────────────────────────────────
 
-function SongList({ songs, showId, canReceiveTips }: {
+function SongList({
+  songs,
+  showId,
+  canReceiveTips,
+}: {
   songs: PublicSong[]
   showId: string
   canReceiveTips: boolean
@@ -141,7 +152,7 @@ function SongList({ songs, showId, canReceiveTips }: {
             <p className="text-xs text-zinc-500 uppercase tracking-widest mb-2">{style}</p>
           )}
           <ul className="space-y-2">
-            {items.map(song => (
+            {items.map((song) => (
               <li key={song.id}>
                 <button
                   onClick={() => setSelected(song)}
@@ -170,7 +181,12 @@ function SongList({ songs, showId, canReceiveTips }: {
 
 // ─── Modal de pedido ──────────────────────────────────────────────────────────
 
-function RequestModal({ song, showId, canReceiveTips, onClose }: {
+function RequestModal({
+  song,
+  showId,
+  canReceiveTips,
+  onClose,
+}: {
   song: PublicSong
   showId: string
   canReceiveTips: boolean
@@ -182,7 +198,7 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
   const [success, setSuccess] = useState(false)
 
   const mutation = useMutation<CreateRequestResponse, ApiError, CreateRequestBody>({
-    mutationFn: body => api.post<CreateRequestResponse>(`/v1/shows/${showId}/requests`, body),
+    mutationFn: (body) => api.post<CreateRequestResponse>(`/v1/shows/${showId}/requests`, body),
     onSuccess: (data) => {
       if (data.payment?.checkoutUrl) {
         window.location.href = data.payment.checkoutUrl
@@ -206,7 +222,9 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4"
-      onClick={e => { if (e.target === e.currentTarget) onClose() }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose()
+      }}
     >
       <div className="w-full max-w-md bg-zinc-900 rounded-t-2xl sm:rounded-2xl border border-zinc-800 p-6 space-y-5">
         {success ? (
@@ -223,7 +241,7 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
                 <input
                   type="text"
                   value={name}
-                  onChange={e => setName(e.target.value)}
+                  onChange={(e) => setName(e.target.value)}
                   maxLength={60}
                   placeholder="Como devo te chamar?"
                   className="input"
@@ -234,7 +252,7 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
               <Field label="Dedicatória (opcional)">
                 <textarea
                   value={message}
-                  onChange={e => setMessage(e.target.value)}
+                  onChange={(e) => setMessage(e.target.value)}
                   maxLength={280}
                   rows={2}
                   placeholder="Uma mensagem para o artista..."
@@ -242,9 +260,7 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
                 />
               </Field>
 
-              {canReceiveTips && (
-                <TipSelector value={tipCents} onChange={setTipCents} />
-              )}
+              {canReceiveTips && <TipSelector value={tipCents} onChange={setTipCents} />}
 
               {mutation.isError && (
                 <p className="text-red-400 text-sm">{mutation.error?.message}</p>
@@ -255,7 +271,11 @@ function RequestModal({ song, showId, canReceiveTips, onClose }: {
                 disabled={mutation.isPending || !name.trim()}
                 className="w-full py-3 rounded-xl bg-white text-zinc-950 font-semibold text-sm hover:bg-zinc-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {mutation.isPending ? 'Enviando…' : tipCents > 0 ? `Pedir + pagar R$ ${(tipCents / 100).toFixed(2)}` : 'Pedir esta música'}
+                {mutation.isPending
+                  ? 'Enviando…'
+                  : tipCents > 0
+                    ? `Pedir + pagar R$ ${(tipCents / 100).toFixed(2)}`
+                    : 'Pedir esta música'}
               </button>
             </form>
           </>
@@ -274,15 +294,16 @@ function TipSelector({ value, onChange }: { value: number; onChange: (v: number)
     <div className="space-y-2">
       <p className="text-xs font-medium text-zinc-400">Gorjeta (opcional)</p>
       <div className="flex gap-2 flex-wrap">
-        {TIP_OPTIONS.map(cents => (
+        {TIP_OPTIONS.map((cents) => (
           <button
             key={cents}
             type="button"
             onClick={() => onChange(cents)}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors border
-              ${value === cents
-                ? 'bg-white text-zinc-950 border-white'
-                : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-500'
+              ${
+                value === cents
+                  ? 'bg-white text-zinc-950 border-white'
+                  : 'bg-zinc-800 text-zinc-300 border-zinc-700 hover:border-zinc-500'
               }`}
           >
             {cents === 0 ? 'Sem gorjeta' : `R$ ${(cents / 100).toFixed(2)}`}
@@ -333,9 +354,7 @@ function LoadingState() {
 }
 
 function ErrorState({ error }: { error: unknown }) {
-  const msg = error instanceof ApiError
-    ? error.message
-    : 'Não foi possível carregar o show.'
+  const msg = error instanceof ApiError ? error.message : 'Não foi possível carregar o show.'
 
   return (
     <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">

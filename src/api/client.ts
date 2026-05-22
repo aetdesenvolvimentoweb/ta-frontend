@@ -2,7 +2,10 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? ''
 
 type RequestOptions = Omit<RequestInit, 'body'> & { auth?: boolean; body?: unknown }
 
-async function request<T>(path: string, { auth = false, body, ...init }: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  { auth = false, body, ...init }: RequestOptions = {}
+): Promise<T> {
   const headers = new Headers(init.headers)
 
   if (body !== undefined) {

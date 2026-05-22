@@ -1,9 +1,9 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
+import { type ApiError, api } from '@/api/client'
+import type { AppMetrics, MergeStylesRequest, Style } from '@/api/types'
 import { useToast } from '@/components/Toast'
-import type { AppMetrics, Style, MergeStylesRequest } from '@/api/types'
 
 type Tab = 'metricas' | 'estilos'
 
@@ -72,9 +72,7 @@ function TabButton({
     <button
       onClick={onClick}
       className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-        active
-          ? 'border-white text-white'
-          : 'border-transparent text-zinc-500 hover:text-zinc-300'
+        active ? 'border-white text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
       }`}
     >
       {children}
@@ -201,9 +199,7 @@ function MetricCard({
   return (
     <div
       className={`rounded-xl border p-4 space-y-1 ${
-        highlight
-          ? 'bg-amber-900/20 border-amber-800/60'
-          : 'bg-zinc-900 border-zinc-800'
+        highlight ? 'bg-amber-900/20 border-amber-800/60' : 'bg-zinc-900 border-zinc-800'
       }`}
     >
       <p className="text-xs text-zinc-500">{label}</p>
@@ -231,9 +227,9 @@ function EstilosSection() {
   })
 
   const createMutation = useMutation<Style, ApiError, { name: string }>({
-    mutationFn: body => api.post<Style>('/v1/admin/styles', body, { auth: true }),
+    mutationFn: (body) => api.post<Style>('/v1/admin/styles', body, { auth: true }),
     onSuccess: (created) => {
-      qc.setQueryData<Style[]>(['styles'], old => (old ? [...old, created] : [created]))
+      qc.setQueryData<Style[]>(['styles'], (old) => (old ? [...old, created] : [created]))
       setNewName('')
       showToast(`Estilo "${created.name}" criado.`)
     },
@@ -241,7 +237,7 @@ function EstilosSection() {
   })
 
   const mergeMutation = useMutation<unknown, ApiError, MergeStylesRequest>({
-    mutationFn: body => api.post('/v1/admin/styles/merge', body, { auth: true }),
+    mutationFn: (body) => api.post('/v1/admin/styles/merge', body, { auth: true }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['styles'] })
       setMergeSource('')
@@ -274,7 +270,7 @@ function EstilosSection() {
         <form onSubmit={handleCreate} className="flex gap-2">
           <input
             value={newName}
-            onChange={e => setNewName(e.target.value)}
+            onChange={(e) => setNewName(e.target.value)}
             placeholder="Ex: MPB, Rock, Forró…"
             maxLength={50}
             className="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm placeholder:text-zinc-600 focus:outline-none focus:border-zinc-500"
@@ -297,7 +293,7 @@ function EstilosSection() {
           </h2>
           {styles.length >= 2 && (
             <button
-              onClick={() => setShowMerge(v => !v)}
+              onClick={() => setShowMerge((v) => !v)}
               className="text-xs text-zinc-500 hover:text-white transition-colors"
             >
               {showMerge ? 'Cancelar merge' : 'Unificar estilos'}
@@ -314,7 +310,7 @@ function EstilosSection() {
             {styles
               .slice()
               .sort((a, b) => a.name.localeCompare(b.name))
-              .map(s => (
+              .map((s) => (
                 <div
                   key={s.id}
                   className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 last:border-0"
@@ -392,14 +388,14 @@ function StyleSelect({
   return (
     <select
       value={value}
-      onChange={e => onChange(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-zinc-500"
     >
       <option value="">{placeholder}</option>
       {styles
-        .filter(s => s.id !== exclude)
+        .filter((s) => s.id !== exclude)
         .sort((a, b) => a.name.localeCompare(b.name))
-        .map(s => (
+        .map((s) => (
           <option key={s.id} value={s.id}>
             {s.name}
           </option>

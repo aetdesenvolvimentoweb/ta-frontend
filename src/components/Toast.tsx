@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useRef } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 
 interface ToastItem {
   id: number
@@ -18,15 +18,15 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
     const id = nextId.current++
-    setToasts(prev => [...prev, { id, message, type }])
-    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3500)
+    setToasts((prev) => [...prev, { id, message, type }])
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500)
   }, [])
 
   return (
     <ToastContext.Provider value={{ showToast }}>
       {children}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-50 pointer-events-none w-max max-w-sm">
-        {toasts.map(t => (
+        {toasts.map((t) => (
           <div
             key={t.id}
             className={`px-4 py-3 rounded-xl text-sm font-medium shadow-lg pointer-events-auto ${

@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useNavigate, Navigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
+import { useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { type ApiError, api } from '@/api/client'
 import type { LoginRequest, LoginResponse } from '@/api/types'
 
 export default function LoginPage() {
@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
 
   const mutation = useMutation<LoginResponse, ApiError, LoginRequest>({
-    mutationFn: body => api.post<LoginResponse>('/v1/artists/login', body),
+    mutationFn: (body) => api.post<LoginResponse>('/v1/artists/login', body),
     onSuccess: async (data) => {
       sessionStorage.setItem('jwt', data.token)
       try {
@@ -45,7 +45,7 @@ export default function LoginPage() {
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
               className="input"
               required
@@ -58,7 +58,7 @@ export default function LoginPage() {
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               className="input"
               required
@@ -66,9 +66,7 @@ export default function LoginPage() {
             />
           </div>
 
-          {mutation.isError && (
-            <p className="text-red-400 text-sm">{mutation.error?.message}</p>
-          )}
+          {mutation.isError && <p className="text-red-400 text-sm">{mutation.error?.message}</p>}
 
           <button
             type="submit"

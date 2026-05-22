@@ -1,16 +1,16 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { AdminRoute } from '@/components/AdminRoute'
-import RootPage from '@/pages/RootPage'
-import ShowPage from '@/pages/public/ShowPage'
-import LoginPage from '@/pages/artista/LoginPage'
+import { ProtectedRoute } from '@/components/ProtectedRoute'
+import AdminPage from '@/pages/admin/AdminPage'
 import CadastroPage from '@/pages/artista/CadastroPage'
 import DashboardPage from '@/pages/artista/DashboardPage'
-import RepertorioPage from '@/pages/artista/RepertorioPage'
+import LoginPage from '@/pages/artista/LoginPage'
 import NovoShowPage from '@/pages/artista/NovoShowPage'
 import PerfilPage from '@/pages/artista/PerfilPage'
-import AdminPage from '@/pages/admin/AdminPage'
+import RepertorioPage from '@/pages/artista/RepertorioPage'
 import NotFoundPage from '@/pages/NotFoundPage'
+import ShowPage from '@/pages/public/ShowPage'
+import RootPage from '@/pages/RootPage'
 
 export const router = createBrowserRouter([
   { path: '/', element: <RootPage /> },
@@ -28,9 +28,7 @@ export const router = createBrowserRouter([
   },
   {
     element: <AdminRoute />,
-    children: [
-      { path: '/admin', element: <AdminPage /> },
-    ],
+    children: [{ path: '/admin', element: <AdminPage /> }],
   },
   { path: '*', element: <NotFoundPage /> },
 ])

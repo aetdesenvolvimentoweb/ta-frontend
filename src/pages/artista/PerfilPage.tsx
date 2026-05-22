@@ -1,8 +1,12 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
-import type { ArtistProfile, UpdateProfileRequest, StartPaymentConnectionResponse } from '@/api/types'
+import { type ApiError, api } from '@/api/client'
+import type {
+  ArtistProfile,
+  StartPaymentConnectionResponse,
+  UpdateProfileRequest,
+} from '@/api/types'
 
 const SOCIAL_PLATFORMS: { key: string; label: string; placeholder: string }[] = [
   { key: 'instagram', label: 'Instagram', placeholder: 'https://instagram.com/...' },
@@ -46,7 +50,11 @@ function Header() {
 // ─── Conteúdo principal ───────────────────────────────────────────────────────
 
 function ProfileContent() {
-  const { data: profile, isLoading, isError } = useQuery<ArtistProfile>({
+  const {
+    data: profile,
+    isLoading,
+    isError,
+  } = useQuery<ArtistProfile>({
     queryKey: ['artist-profile'],
     queryFn: () => api.get<ArtistProfile>('/v1/artists/me', { auth: true }),
   })
@@ -77,7 +85,7 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
   const [name, setName] = useState(profile.name)
 
   const mutation = useMutation<ArtistProfile, ApiError, UpdateProfileRequest>({
-    mutationFn: body => api.patch<ArtistProfile>('/v1/artists/me', body, { auth: true }),
+    mutationFn: (body) => api.patch<ArtistProfile>('/v1/artists/me', body, { auth: true }),
     onSuccess: (updated) => {
       qc.setQueryData(['artist-profile'], updated)
       setEditing(false)
@@ -86,15 +94,16 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
 
   const handleSave = () => {
     const trimmed = name.trim()
-    if (!trimmed || trimmed === profile.name) { setEditing(false); return }
+    if (!trimmed || trimmed === profile.name) {
+      setEditing(false)
+      return
+    }
     mutation.mutate({ name: trimmed })
   }
 
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 space-y-4">
-      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
-        Informações
-      </p>
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Informações</p>
 
       <div className="space-y-3">
         <div className="space-y-1.5">
@@ -103,16 +112,22 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               className="input"
               autoFocus
-              onKeyDown={e => { if (e.key === 'Enter') handleSave(); if (e.key === 'Escape') setEditing(false) }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleSave()
+                if (e.key === 'Escape') setEditing(false)
+              }}
             />
           ) : (
             <div className="flex items-center justify-between gap-2">
               <p className="text-sm font-medium">{profile.name}</p>
               <button
-                onClick={() => { setName(profile.name); setEditing(true) }}
+                onClick={() => {
+                  setName(profile.name)
+                  setEditing(true)
+                }}
                 className="text-xs text-zinc-500 hover:text-white transition-colors"
               >
                 Editar
@@ -145,9 +160,7 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
         </div>
       )}
 
-      {mutation.isError && (
-        <p className="text-red-400 text-xs">{mutation.error?.message}</p>
-      )}
+      {mutation.isError && <p className="text-red-400 text-xs">{mutation.error?.message}</p>}
     </section>
   )
 }
@@ -160,7 +173,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
   const [dirty, setDirty] = useState(false)
 
   const mutation = useMutation<ArtistProfile, ApiError, UpdateProfileRequest>({
-    mutationFn: body => api.patch<ArtistProfile>('/v1/artists/me', body, { auth: true }),
+    mutationFn: (body) => api.patch<ArtistProfile>('/v1/artists/me', body, { auth: true }),
     onSuccess: (updated) => {
       qc.setQueryData(['artist-profile'], updated)
       setDirty(false)
@@ -168,7 +181,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
   })
 
   const handleChange = (key: string, value: string) => {
-    setSocials(prev => {
+    setSocials((prev) => {
       const next = { ...prev }
       if (value.trim()) next[key] = value.trim()
       else delete next[key]
@@ -179,9 +192,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
 
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 space-y-4">
-      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
-        Redes sociais
-      </p>
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Redes sociais</p>
 
       <div className="space-y-3">
         {SOCIAL_PLATFORMS.map(({ key, label, placeholder }) => (
@@ -190,7 +201,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
             <input
               type="url"
               value={socials[key] ?? ''}
-              onChange={e => handleChange(key, e.target.value)}
+              onChange={(e) => handleChange(key, e.target.value)}
               placeholder={placeholder}
               className="input"
             />
@@ -198,9 +209,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
         ))}
       </div>
 
-      {mutation.isError && (
-        <p className="text-red-400 text-xs">{mutation.error?.message}</p>
-      )}
+      {mutation.isError && <p className="text-red-400 text-xs">{mutation.error?.message}</p>}
 
       <button
         onClick={() => mutation.mutate({ socials })}
@@ -232,10 +241,9 @@ function PaymentSection({ profile }: { profile: ArtistProfile }) {
   })
 
   const disconnectMutation = useMutation<unknown, ApiError, void>({
-    mutationFn: () =>
-      api.delete('/v1/payment-accounts/mercado_pago', { auth: true }),
+    mutationFn: () => api.delete('/v1/payment-accounts/mercado_pago', { auth: true }),
     onSuccess: () => {
-      qc.setQueryData<ArtistProfile>(['artist-profile'], old =>
+      qc.setQueryData<ArtistProfile>(['artist-profile'], (old) =>
         old ? { ...old, canReceiveTips: false, paymentGateway: undefined } : old
       )
       setConfirmDisconnect(false)
@@ -294,8 +302,8 @@ function PaymentSection({ profile }: { profile: ArtistProfile }) {
             <p className="text-sm text-zinc-400">Nenhuma conta conectada</p>
           </div>
           <p className="text-xs text-zinc-500">
-            Conecte sua conta do Mercado Pago para habilitar gorjetas via PIX.
-            Você recebe 85% de cada gorjeta diretamente.
+            Conecte sua conta do Mercado Pago para habilitar gorjetas via PIX. Você recebe 85% de
+            cada gorjeta diretamente.
           </p>
 
           {connectMutation.isError && (

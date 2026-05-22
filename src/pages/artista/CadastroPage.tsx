@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { useNavigate, Navigate, Link } from 'react-router-dom'
 import { useMutation } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
+import { useState } from 'react'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { type ApiError, api } from '@/api/client'
 import type { RegisterRequest, RegisterResponse } from '@/api/types'
 
 export default function CadastroPage() {
@@ -11,7 +11,7 @@ export default function CadastroPage() {
   const [password, setPassword] = useState('')
 
   const mutation = useMutation<RegisterResponse, ApiError, RegisterRequest>({
-    mutationFn: body => api.post<RegisterResponse>('/v1/artists', body),
+    mutationFn: (body) => api.post<RegisterResponse>('/v1/artists', body),
     onSuccess: (data) => {
       sessionStorage.setItem('jwt', data.token)
       navigate('/artista/dashboard', { replace: true })
@@ -41,7 +41,7 @@ export default function CadastroPage() {
             <input
               type="text"
               value={name}
-              onChange={e => setName(e.target.value)}
+              onChange={(e) => setName(e.target.value)}
               placeholder="Como você se apresenta?"
               className="input"
               minLength={2}
@@ -55,7 +55,7 @@ export default function CadastroPage() {
             <input
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
               className="input"
               required
@@ -68,7 +68,7 @@ export default function CadastroPage() {
             <input
               type="password"
               value={password}
-              onChange={e => setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Mínimo 8 caracteres"
               className="input"
               minLength={8}
@@ -77,9 +77,7 @@ export default function CadastroPage() {
             />
           </div>
 
-          {mutation.isError && (
-            <p className="text-red-400 text-sm">{mutation.error?.message}</p>
-          )}
+          {mutation.isError && <p className="text-red-400 text-sm">{mutation.error?.message}</p>}
 
           <button
             type="submit"

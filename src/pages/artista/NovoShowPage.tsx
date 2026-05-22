@@ -1,7 +1,7 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { api, ApiError } from '@/api/client'
+import { type ApiError, api } from '@/api/client'
 import type { ActiveShow, ArtistProfile, CreateShowRequest, CreateShowResponse } from '@/api/types'
 
 export default function NovoShowPage() {
@@ -81,7 +81,7 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
   const [scheduledStartTime, setScheduledStartTime] = useState('')
 
   const mutation = useMutation<CreateShowResponse, ApiError, CreateShowRequest>({
-    mutationFn: body => api.post<CreateShowResponse>('/v1/shows', body, { auth: true }),
+    mutationFn: (body) => api.post<CreateShowResponse>('/v1/shows', body, { auth: true }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['active-show'] })
       navigate('/artista/dashboard', { replace: true })
@@ -92,7 +92,9 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
     e.preventDefault()
     mutation.mutate({
       durationHours,
-      scheduledStartTime: scheduledStartTime ? new Date(scheduledStartTime).toISOString() : undefined,
+      scheduledStartTime: scheduledStartTime
+        ? new Date(scheduledStartTime).toISOString()
+        : undefined,
     })
   }
 
@@ -109,7 +111,10 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
         <div className="rounded-xl border border-yellow-800 bg-yellow-950/40 px-4 py-3">
           <p className="text-yellow-400 text-sm">
             Sem conta Mercado Pago conectada — gorjetas não estarão disponíveis neste show.{' '}
-            <Link to="/artista/perfil" className="underline hover:text-yellow-300 transition-colors">
+            <Link
+              to="/artista/perfil"
+              className="underline hover:text-yellow-300 transition-colors"
+            >
               Conecte em Perfil
             </Link>
             .
@@ -133,10 +138,12 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
             max={24}
             required
             value={durationHours}
-            onChange={e => setDurationHours(Number(e.target.value))}
+            onChange={(e) => setDurationHours(Number(e.target.value))}
             className="input"
           />
-          <p className="text-xs text-zinc-600">Entre 1 e 24 horas. O show expira automaticamente ao fim deste período.</p>
+          <p className="text-xs text-zinc-600">
+            Entre 1 e 24 horas. O show expira automaticamente ao fim deste período.
+          </p>
         </div>
 
         <div className="space-y-1.5">
@@ -149,7 +156,7 @@ function CreateShowForm({ canReceiveTips }: { canReceiveTips: boolean }) {
             min={minDatetime}
             max={maxDatetime}
             value={scheduledStartTime}
-            onChange={e => setScheduledStartTime(e.target.value)}
+            onChange={(e) => setScheduledStartTime(e.target.value)}
             className="input"
           />
           <p className="text-xs text-zinc-600">
