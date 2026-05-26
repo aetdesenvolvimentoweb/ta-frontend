@@ -1,11 +1,13 @@
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type { LoginRequest, LoginResponse } from '@/api/types'
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const expired = searchParams.get('expired') === '1'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
@@ -39,6 +41,12 @@ export default function LoginPage() {
           <p className="text-sm text-zinc-400">Painel do artista</p>
         </div>
 
+        {expired && (
+          <p className="rounded-lg border border-amber-900 bg-amber-950/40 px-3 py-2 text-center text-sm text-amber-300">
+            Sua sessão expirou. Entre novamente.
+          </p>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label htmlFor="login-email" className="text-xs font-medium text-zinc-400">
@@ -65,9 +73,10 @@ export default function LoginPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              placeholder="••••••••••••"
               className="input"
               required
+              minLength={12}
               autoComplete="current-password"
             />
           </div>
