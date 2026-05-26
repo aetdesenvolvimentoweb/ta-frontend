@@ -1,4 +1,14 @@
-const BASE_URL = import.meta.env.VITE_API_URL ?? ''
+const BASE_URL = (() => {
+  const url = import.meta.env.VITE_API_URL
+  if (import.meta.env.PROD && !url) {
+    throw new Error(
+      'VITE_API_URL não está definida no build de produção. Configure no painel do Cloudflare Pages.'
+    )
+  }
+  return url ?? ''
+})()
+
+const LOGIN_PATH = '/artista/login'
 
 type RequestOptions = Omit<RequestInit, 'body'> & { auth?: boolean; body?: unknown }
 
@@ -23,6 +33,14 @@ async function request<T>(
     body: body !== undefined ? JSON.stringify(body) : undefined,
     credentials: 'include',
   })
+
+  if (res.status === 401 && auth) {
+    sessionStorage.removeItem('jwt')
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith(LOGIN_PATH)) {
+      window.location.assign(`${LOGIN_PATH}?expired=1`)
+    }
+    throw new ApiError(401, 'Sessão expirada. Faça login novamente.')
+  }
 
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
