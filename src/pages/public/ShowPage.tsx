@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { cloneElement, type ReactElement, useEffect, useId, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { ApiError, api } from '@/api/client'
 import type { CreateRequestBody, CreateRequestResponse, PublicShow, PublicSong } from '@/api/types'
 
@@ -49,7 +49,48 @@ export default function ShowPage() {
       ) : (
         <SongList songs={data.songs} showId={showId} canReceiveTips={data.artist.canReceiveTips} />
       )}
+      <PaymentToast />
     </PageShell>
+  )
+}
+
+// ─── Toast de retorno do checkout MP ─────────────────────────────────────────
+// MP redireciona para `?payment=success|failure|pending` após o checkout.
+// Mostra um toast temporário (5s) e limpa o query param para não reexibir em reload.
+
+function PaymentToast() {
+  const [searchParams, setSearchParams] = useSearchParams()
+  const status = searchParams.get('payment')
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    if (status !== 'success' && status !== 'failure' && status !== 'pending') return
+    setVisible(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('payment')
+    setSearchParams(next, { replace: true })
+    const id = setTimeout(() => setVisible(false), 5000)
+    return () => clearTimeout(id)
+  }, [status, searchParams, setSearchParams])
+
+  if (!visible || (status !== 'success' && status !== 'failure' && status !== 'pending')) {
+    return null
+  }
+
+  const styles = {
+    success: { bg: 'bg-emerald-600', text: 'Gorjeta confirmada — obrigado!' },
+    failure: { bg: 'bg-red-600', text: 'Pagamento não concluído — tente novamente.' },
+    pending: { bg: 'bg-amber-600', text: 'Pagamento em análise — você será notificado.' },
+  }[status]
+
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl text-white text-sm font-medium shadow-lg ${styles.bg} max-w-[90vw]`}
+    >
+      {styles.text}
+    </div>
   )
 }
 
