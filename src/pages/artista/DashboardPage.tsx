@@ -3,7 +3,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
-import type { ActiveShow, ArtistSong, ShowRequest } from '@/api/types'
+import type { ActiveShow, ArtistMetrics, ArtistSong, ShowRequest } from '@/api/types'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -129,6 +129,12 @@ function ActiveShowView({
     onSuccess: () => qc.invalidateQueries({ queryKey: ['show-requests', show.id] }),
   })
 
+  const cancelMutation = useMutation<unknown, ApiError, string>({
+    mutationFn: (requestId) =>
+      api.patch(`/v1/shows/${show.id}/requests/${requestId}/cancel`, {}, { auth: true }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['show-requests', show.id] }),
+  })
+
   const finishMutation = useMutation<unknown, ApiError, void>({
     mutationFn: () => api.post(`/v1/shows/${show.id}/finish`, {}, { auth: true }),
     onSuccess: () => {
@@ -200,6 +206,9 @@ function ActiveShowView({
         <p className="text-red-400 text-sm">{finishMutation.error?.message}</p>
       )}
 
+      {/* Receita acumulada (RN02) */}
+      <ArtistMetricsCard />
+
       {/* QR Code do show */}
       <ShowQRCode showId={show.id} />
 
@@ -224,6 +233,16 @@ function ActiveShowView({
             song={songMap[req.songId]}
             onPlay={() => playMutation.mutate(req.songId)}
             isPlaying={playMutation.isPending && playMutation.variables === req.songId}
+            onCancel={() => {
+              const hasTip = req.tipAmountInCents > 0
+              const confirmMessage = hasTip
+                ? `Cancelar este pedido vai estornar a gorjeta de R$ ${(
+                    req.tipAmountInCents / 100
+                  ).toFixed(2)} para ${req.customerName}. Confirma?`
+                : `Cancelar o pedido de ${req.customerName}?`
+              if (window.confirm(confirmMessage)) cancelMutation.mutate(req.id)
+            }}
+            isCancelling={cancelMutation.isPending && cancelMutation.variables === req.id}
             played={false}
           />
         ))}
@@ -242,6 +261,8 @@ function ActiveShowView({
               song={songMap[req.songId]}
               onPlay={() => {}}
               isPlaying={false}
+              onCancel={() => {}}
+              isCancelling={false}
               played={true}
             />
           ))}
@@ -368,12 +389,16 @@ function RequestCard({
   song,
   onPlay,
   isPlaying,
+  onCancel,
+  isCancelling,
   played,
 }: {
   request: ShowRequest
   song: ArtistSong | undefined
   onPlay: () => void
   isPlaying: boolean
+  onCancel: () => void
+  isCancelling: boolean
   played: boolean
 }) {
   return (
@@ -403,16 +428,68 @@ function RequestCard({
       </div>
 
       {!played && (
-        <button
-          type="button"
-          onClick={onPlay}
-          disabled={isPlaying}
-          className="w-full py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm font-medium disabled:opacity-50 transition-colors border border-zinc-700 hover:border-zinc-600"
-        >
-          {isPlaying ? 'Marcando…' : '✓ Tocada'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={onPlay}
+            disabled={isPlaying || isCancelling}
+            className="flex-1 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-sm font-medium disabled:opacity-50 transition-colors border border-zinc-700 hover:border-zinc-600"
+          >
+            {isPlaying ? 'Marcando…' : '✓ Tocada'}
+          </button>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPlaying || isCancelling}
+            className="px-3 py-2 rounded-lg bg-zinc-900 hover:bg-red-950 text-red-400 hover:text-red-300 text-xs font-medium disabled:opacity-50 transition-colors border border-zinc-800 hover:border-red-900"
+            aria-label="Cancelar pedido"
+          >
+            {isCancelling ? '…' : 'Cancelar'}
+          </button>
+        </div>
       )}
     </div>
+  )
+}
+
+// ─── Card de métricas do artista (RN02) ───────────────────────────────────────
+
+function ArtistMetricsCard() {
+  const { data, isLoading, isError } = useQuery<ArtistMetrics>({
+    queryKey: ['artist-metrics'],
+    queryFn: () => api.get<ArtistMetrics>('/v1/metrics/me', { auth: true }),
+    staleTime: 30_000,
+  })
+
+  if (isLoading || isError || !data) return null
+  if (data.totalRequestsPlayed === 0) return null
+
+  return (
+    <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-4 space-y-3">
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">
+        Receita acumulada
+      </p>
+      <div className="grid grid-cols-3 gap-3 text-center">
+        <div>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Bruto</p>
+          <p className="font-semibold text-sm mt-1">R$ {data.totalEarned.toFixed(2)}</p>
+        </div>
+        <div>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">Você (85%)</p>
+          <p className="font-semibold text-sm mt-1 text-emerald-400">
+            R$ {data.artistShare.toFixed(2)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] text-zinc-500 uppercase tracking-widest">App (15%)</p>
+          <p className="font-semibold text-sm mt-1 text-zinc-400">R$ {data.appShare.toFixed(2)}</p>
+        </div>
+      </div>
+      <p className="text-[10px] text-zinc-600 text-center">
+        {data.totalRequestsPlayed} música{data.totalRequestsPlayed !== 1 ? 's' : ''} tocada
+        {data.totalRequestsPlayed !== 1 ? 's' : ''}
+      </p>
+    </section>
   )
 }
 

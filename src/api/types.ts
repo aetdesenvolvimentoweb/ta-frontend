@@ -176,6 +176,16 @@ export interface ShowDetails {
   requests: ShowDetailsRequest[]
 }
 
+// ---------- Métricas do artista (RN02) ----------
+
+export interface ArtistMetrics {
+  totalEarned: number
+  artistShare: number
+  appShare: number
+  totalRequestsPlayed: number
+  appCommissionPercent: number
+}
+
 // ---------- Admin ----------
 
 export interface AppMetrics {
