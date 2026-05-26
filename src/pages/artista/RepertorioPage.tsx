@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type { AddSongRequest, ArtistSong, Style } from '@/api/types'
@@ -36,6 +36,7 @@ function Header({ onAdd, showingForm }: { onAdd: () => void; showingForm: boolea
         <span className="font-semibold text-sm">Repertório</span>
       </div>
       <button
+        type="button"
         onClick={onAdd}
         className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white text-zinc-950 hover:bg-zinc-100 transition-colors"
       >
@@ -52,6 +53,11 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
   const [title, setTitle] = useState('')
   const [originalArtist, setOriginalArtist] = useState('')
   const [styleName, setStyleName] = useState('')
+  const titleInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    titleInputRef.current?.focus()
+  }, [])
 
   const { data: styles = [], isLoading: stylesLoading } = useQuery<Style[]>({
     queryKey: ['styles'],
@@ -86,8 +92,12 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
       <p className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Nova música</p>
 
       <div className="space-y-1.5">
-        <label className="text-xs text-zinc-500">Título</label>
+        <label htmlFor="song-titulo" className="text-xs text-zinc-500">
+          Título
+        </label>
         <input
+          id="song-titulo"
+          ref={titleInputRef}
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -95,13 +105,15 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
           className="input"
           required
           minLength={1}
-          autoFocus
         />
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs text-zinc-500">Artista original</label>
+        <label htmlFor="song-artista" className="text-xs text-zinc-500">
+          Artista original
+        </label>
         <input
+          id="song-artista"
           type="text"
           value={originalArtist}
           onChange={(e) => setOriginalArtist(e.target.value)}
@@ -113,7 +125,9 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs text-zinc-500">Estilo musical</label>
+        <label htmlFor="song-estilo" className="text-xs text-zinc-500">
+          Estilo musical
+        </label>
         {stylesLoading ? (
           <div className="input flex items-center">
             <span className="text-zinc-600 text-sm">Carregando estilos…</span>
@@ -126,6 +140,7 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
           </div>
         ) : (
           <select
+            id="song-estilo"
             value={styleName}
             onChange={(e) => setStyleName(e.target.value)}
             className="input"
@@ -243,6 +258,7 @@ function SongRow({ song }: { song: ArtistSong }) {
       </div>
 
       <button
+        type="button"
         onClick={() => toggleMutation.mutate(!song.isAvailable)}
         disabled={toggleMutation.isPending}
         aria-label={song.isAvailable ? 'Tornar indisponível' : 'Tornar disponível'}

@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { cloneElement, type ReactElement, useEffect, useId, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ApiError, api } from '@/api/client'
 import type { CreateRequestBody, CreateRequestResponse, PublicShow, PublicSong } from '@/api/types'
@@ -13,6 +13,13 @@ export default function ShowPage() {
     enabled: !!showId,
     retry: 1,
   })
+
+  if (!showId)
+    return (
+      <PageShell>
+        <ErrorState error={new ApiError(400, 'Link inválido — código do show ausente.')} />
+      </PageShell>
+    )
 
   if (isLoading)
     return (
@@ -40,7 +47,7 @@ export default function ShowPage() {
       ) : isScheduled ? (
         <ScheduledState startTime={data.show.startTime} />
       ) : (
-        <SongList songs={data.songs} showId={showId!} canReceiveTips={data.artist.canReceiveTips} />
+        <SongList songs={data.songs} showId={showId} canReceiveTips={data.artist.canReceiveTips} />
       )}
     </PageShell>
   )
@@ -155,6 +162,7 @@ function SongList({
             {items.map((song) => (
               <li key={song.id}>
                 <button
+                  type="button"
                   onClick={() => setSelected(song)}
                   className="w-full text-left p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 transition-colors border border-zinc-800 hover:border-zinc-600"
                 >
@@ -219,20 +227,36 @@ function RequestModal({
     })
   }
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose()
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [onClose])
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm px-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose()
-      }}
-    >
-      <div className="w-full max-w-md bg-zinc-900 rounded-t-2xl sm:rounded-2xl border border-zinc-800 p-6 space-y-5">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center px-4">
+      <button
+        type="button"
+        aria-label="Fechar"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm cursor-default"
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="request-modal-title"
+        className="relative w-full max-w-md bg-zinc-900 rounded-t-2xl sm:rounded-2xl border border-zinc-800 p-6 space-y-5"
+      >
         {success ? (
           <SuccessState songTitle={song.title} onClose={onClose} />
         ) : (
           <>
             <div>
-              <h3 className="font-semibold text-base">{song.title}</h3>
+              <h3 id="request-modal-title" className="font-semibold text-base">
+                {song.title}
+              </h3>
               <p className="text-xs text-zinc-500 mt-0.5">{song.originalArtist}</p>
             </div>
 
@@ -316,11 +340,14 @@ function TipSelector({ value, onChange }: { value: number; onChange: (v: number)
 
 // ─── Subcomponentes ───────────────────────────────────────────────────────────
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, children }: { label: string; children: ReactElement<{ id?: string }> }) {
+  const id = useId()
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-medium text-zinc-400">{label}</label>
-      {children}
+      <label htmlFor={id} className="text-xs font-medium text-zinc-400">
+        {label}
+      </label>
+      {cloneElement(children, { id })}
     </div>
   )
 }
@@ -336,6 +363,7 @@ function SuccessState({ songTitle, onClose }: { songTitle: string; onClose: () =
         </p>
       </div>
       <button
+        type="button"
         onClick={onClose}
         className="text-sm text-zinc-400 hover:text-white transition-colors underline underline-offset-4"
       >

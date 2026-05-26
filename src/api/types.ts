@@ -139,6 +139,43 @@ export interface CreateShowResponse {
   status: string
 }
 
+// ---------- Histórico de shows ----------
+
+export interface ShowHistoryItem {
+  id: string
+  startTime: string
+  durationHours: number
+  status: 'finished' | 'expired'
+  totalRequests: number
+  totalPlayed: number
+  totalTipsInReal: number
+  artistShareInReal: number
+}
+
+export interface ShowDetailsRequest {
+  id: string
+  songId: string
+  songTitle: string
+  songOriginalArtist: string
+  customerName: string
+  message: string | null
+  tipAmountInCents: number
+  status: 'pending' | 'played' | 'cancelled' | 'refunded'
+  createdAt: string
+}
+
+export interface ShowDetails {
+  id: string
+  startTime: string
+  durationHours: number
+  status: 'active' | 'finished' | 'expired'
+  totalRequests: number
+  totalPlayed: number
+  totalTipsInReal: number
+  artistShareInReal: number
+  requests: ShowDetailsRequest[]
+}
+
 // ---------- Admin ----------
 
 export interface AppMetrics {

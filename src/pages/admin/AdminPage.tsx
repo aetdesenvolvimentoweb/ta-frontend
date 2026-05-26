@@ -48,6 +48,7 @@ function Header({ onLogout }: { onLogout: () => void }) {
         </span>
       </div>
       <button
+        type="button"
         onClick={onLogout}
         className="text-xs text-zinc-500 hover:text-white transition-colors"
       >
@@ -70,6 +71,7 @@ function TabButton({
 }) {
   return (
     <button
+      type="button"
       onClick={onClick}
       className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
         active ? 'border-white text-white' : 'border-transparent text-zinc-500 hover:text-zinc-300'
@@ -293,6 +295,7 @@ function EstilosSection() {
           </h2>
           {styles.length >= 2 && (
             <button
+              type="button"
               onClick={() => setShowMerge((v) => !v)}
               className="text-xs text-zinc-500 hover:text-white transition-colors"
             >
@@ -334,8 +337,11 @@ function EstilosSection() {
           </p>
           <form onSubmit={handleMerge} className="space-y-3">
             <div className="space-y-1.5">
-              <label className="text-xs text-zinc-400">Origem (será deletado)</label>
+              <label htmlFor="merge-source" className="text-xs text-zinc-400">
+                Origem (será deletado)
+              </label>
               <StyleSelect
+                id="merge-source"
                 value={mergeSource}
                 onChange={setMergeSource}
                 styles={styles}
@@ -344,8 +350,11 @@ function EstilosSection() {
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs text-zinc-400">Destino (permanece)</label>
+              <label htmlFor="merge-target" className="text-xs text-zinc-400">
+                Destino (permanece)
+              </label>
               <StyleSelect
+                id="merge-target"
                 value={mergeTarget}
                 onChange={setMergeTarget}
                 styles={styles}
@@ -373,12 +382,14 @@ function EstilosSection() {
 }
 
 function StyleSelect({
+  id,
   value,
   onChange,
   styles,
   exclude,
   placeholder,
 }: {
+  id?: string
   value: string
   onChange: (v: string) => void
   styles: Style[]
@@ -387,6 +398,7 @@ function StyleSelect({
 }) {
   return (
     <select
+      id={id}
       value={value}
       onChange={(e) => onChange(e.target.value)}
       className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-zinc-500"

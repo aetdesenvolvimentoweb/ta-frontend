@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type {
@@ -102,6 +102,11 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
   const qc = useQueryClient()
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(profile.name)
+  const nameInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (editing) nameInputRef.current?.focus()
+  }, [editing])
 
   const mutation = useMutation<ArtistProfile, ApiError, UpdateProfileRequest>({
     mutationFn: (body) => api.patch<ArtistProfile>('/v1/artists/me', body, { auth: true }),
@@ -126,37 +131,46 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
 
       <div className="space-y-3">
         <div className="space-y-1.5">
-          <label className="text-xs text-zinc-500">Nome artístico</label>
           {editing ? (
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="input"
-              autoFocus
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSave()
-                if (e.key === 'Escape') setEditing(false)
-              }}
-            />
-          ) : (
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-sm font-medium">{profile.name}</p>
-              <button
-                onClick={() => {
-                  setName(profile.name)
-                  setEditing(true)
+            <>
+              <label htmlFor="profile-nome" className="text-xs text-zinc-500">
+                Nome artístico
+              </label>
+              <input
+                id="profile-nome"
+                ref={nameInputRef}
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="input"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSave()
+                  if (e.key === 'Escape') setEditing(false)
                 }}
-                className="text-xs text-zinc-500 hover:text-white transition-colors"
-              >
-                Editar
-              </button>
-            </div>
+              />
+            </>
+          ) : (
+            <>
+              <p className="text-xs text-zinc-500">Nome artístico</p>
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-sm font-medium">{profile.name}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setName(profile.name)
+                    setEditing(true)
+                  }}
+                  className="text-xs text-zinc-500 hover:text-white transition-colors"
+                >
+                  Editar
+                </button>
+              </div>
+            </>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs text-zinc-500">E-mail</label>
+          <p className="text-xs text-zinc-500">E-mail</p>
           <p className="text-sm text-zinc-400">{profile.email}</p>
         </div>
       </div>
@@ -164,12 +178,14 @@ function InfoSection({ profile }: { profile: ArtistProfile }) {
       {editing && (
         <div className="flex gap-2 pt-1">
           <button
+            type="button"
             onClick={() => setEditing(false)}
             className="flex-1 py-2 rounded-lg border border-zinc-700 text-zinc-400 text-sm hover:text-white hover:border-zinc-500 transition-colors"
           >
             Cancelar
           </button>
           <button
+            type="button"
             onClick={handleSave}
             disabled={mutation.isPending || !name.trim()}
             className="flex-1 py-2 rounded-lg bg-white text-zinc-950 text-sm font-semibold hover:bg-zinc-100 disabled:opacity-50 transition-colors"
@@ -216,8 +232,11 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
       <div className="space-y-3">
         {SOCIAL_PLATFORMS.map(({ key, label, placeholder }) => (
           <div key={key} className="space-y-1.5">
-            <label className="text-xs text-zinc-500">{label}</label>
+            <label htmlFor={`social-${key}`} className="text-xs text-zinc-500">
+              {label}
+            </label>
             <input
+              id={`social-${key}`}
               type="url"
               value={socials[key] ?? ''}
               onChange={(e) => handleChange(key, e.target.value)}
@@ -231,6 +250,7 @@ function SocialsSection({ profile }: { profile: ArtistProfile }) {
       {mutation.isError && <p className="text-red-400 text-xs">{mutation.error?.message}</p>}
 
       <button
+        type="button"
         onClick={() => mutation.mutate({ socials })}
         disabled={mutation.isPending || !dirty}
         className="w-full py-2.5 rounded-xl bg-white text-zinc-950 font-semibold text-sm hover:bg-zinc-100 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -287,6 +307,7 @@ function PaymentSection({ profile }: { profile: ArtistProfile }) {
 
           {!confirmDisconnect ? (
             <button
+              type="button"
               onClick={() => setConfirmDisconnect(true)}
               className="text-xs text-zinc-500 hover:text-red-400 transition-colors"
             >
@@ -295,12 +316,14 @@ function PaymentSection({ profile }: { profile: ArtistProfile }) {
           ) : (
             <div className="flex items-center gap-2 pt-1">
               <button
+                type="button"
                 onClick={() => setConfirmDisconnect(false)}
                 className="text-xs text-zinc-500 hover:text-white transition-colors"
               >
                 Cancelar
               </button>
               <button
+                type="button"
                 onClick={() => disconnectMutation.mutate()}
                 disabled={disconnectMutation.isPending}
                 className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-xs font-semibold disabled:opacity-50 transition-colors"
@@ -330,6 +353,7 @@ function PaymentSection({ profile }: { profile: ArtistProfile }) {
           )}
 
           <button
+            type="button"
             onClick={() => connectMutation.mutate()}
             disabled={connectMutation.isPending}
             className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm disabled:opacity-50 transition-colors"

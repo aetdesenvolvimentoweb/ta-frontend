@@ -4,6 +4,7 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import AdminPage from '@/pages/admin/AdminPage'
 import CadastroPage from '@/pages/artista/CadastroPage'
 import DashboardPage from '@/pages/artista/DashboardPage'
+import HistoricoPage from '@/pages/artista/HistoricoPage'
 import LoginPage from '@/pages/artista/LoginPage'
 import NovoShowPage from '@/pages/artista/NovoShowPage'
 import PerfilPage from '@/pages/artista/PerfilPage'
@@ -22,6 +23,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/artista/dashboard', element: <DashboardPage /> },
       { path: '/artista/repertorio', element: <RepertorioPage /> },
+      { path: '/artista/historico', element: <HistoricoPage /> },
       { path: '/artista/show/novo', element: <NovoShowPage /> },
       { path: '/artista/perfil', element: <PerfilPage /> },
     ],
