@@ -61,7 +61,7 @@ function AddSongForm({ onSuccess }: { onSuccess: () => void }) {
 
   const { data: styles = [], isLoading: stylesLoading } = useQuery<Style[]>({
     queryKey: ['styles'],
-    queryFn: () => api.get<Style[]>('/v1/styles', { auth: true }),
+    queryFn: () => api.get<Style[]>('/v1/styles'),
     staleTime: 5 * 60_000,
   })
 

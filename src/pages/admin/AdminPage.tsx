@@ -224,7 +224,7 @@ function EstilosSection() {
 
   const { data: styles = [], isLoading } = useQuery<Style[], ApiError>({
     queryKey: ['styles'],
-    queryFn: () => api.get<Style[]>('/v1/styles', { auth: true }),
+    queryFn: () => api.get<Style[]>('/v1/styles'),
     staleTime: 30_000,
   })
 
