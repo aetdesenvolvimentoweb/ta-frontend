@@ -14,9 +14,8 @@ export default function CadastroPage() {
 
   const mutation = useMutation<RegisterResponse, ApiError, RegisterRequest>({
     mutationFn: (body) => api.post<RegisterResponse>('/v1/artists', body),
-    onSuccess: (data) => {
-      sessionStorage.setItem('jwt', data.token)
-      navigate('/artista/dashboard', { replace: true })
+    onSuccess: () => {
+      navigate('/artista/login?cadastro=ok', { replace: true })
     },
   })
 

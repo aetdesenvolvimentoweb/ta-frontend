@@ -4,10 +4,12 @@ import { ProtectedRoute } from '@/components/ProtectedRoute'
 import AdminPage from '@/pages/admin/AdminPage'
 import CadastroPage from '@/pages/artista/CadastroPage'
 import DashboardPage from '@/pages/artista/DashboardPage'
+import EsqueciSenhaPage from '@/pages/artista/EsqueciSenhaPage'
 import HistoricoPage from '@/pages/artista/HistoricoPage'
 import LoginPage from '@/pages/artista/LoginPage'
 import NovoShowPage from '@/pages/artista/NovoShowPage'
 import PerfilPage from '@/pages/artista/PerfilPage'
+import RedefinirSenhaPage from '@/pages/artista/RedefinirSenhaPage'
 import RepertorioPage from '@/pages/artista/RepertorioPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import ShowPage from '@/pages/public/ShowPage'
@@ -18,6 +20,8 @@ export const router = createBrowserRouter([
   { path: '/show/:showId', element: <ShowPage /> },
   { path: '/artista/login', element: <LoginPage /> },
   { path: '/artista/cadastro', element: <CadastroPage /> },
+  { path: '/artista/esqueci-senha', element: <EsqueciSenhaPage /> },
+  { path: '/artista/redefinir-senha', element: <RedefinirSenhaPage /> },
   {
     element: <ProtectedRoute />,
     children: [

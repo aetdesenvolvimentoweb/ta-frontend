@@ -8,6 +8,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const expired = searchParams.get('expired') === '1'
+  const justRegistered = searchParams.get('cadastro') === 'ok'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -45,6 +46,12 @@ export default function LoginPage() {
         {expired && (
           <p className="rounded-lg border border-amber-900 bg-amber-950/40 px-3 py-2 text-center text-sm text-amber-300">
             Sua sessão expirou. Entre novamente.
+          </p>
+        )}
+
+        {justRegistered && !expired && (
+          <p className="rounded-lg border border-emerald-900 bg-emerald-950/40 px-3 py-2 text-center text-sm text-emerald-200">
+            Conta criada com sucesso! Entre com seu e-mail e senha.
           </p>
         )}
 
@@ -126,6 +133,14 @@ export default function LoginPage() {
                   </svg>
                 )}
               </button>
+            </div>
+            <div className="text-right">
+              <Link
+                to="/artista/esqueci-senha"
+                className="text-xs text-zinc-400 hover:text-white hover:underline underline-offset-4 transition-colors"
+              >
+                Esqueci minha senha
+              </Link>
             </div>
           </div>
 

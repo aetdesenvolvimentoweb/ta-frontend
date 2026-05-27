@@ -74,7 +74,6 @@ export interface RegisterRequest {
 
 export interface RegisterResponse {
   artist: { id: string; name: string; email: string; isPremium: boolean }
-  token: string
 }
 
 export interface LoginRequest {
