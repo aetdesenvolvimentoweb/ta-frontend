@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
+import { Brand } from '@/components/Brand'
 
 interface ConfirmBody {
   token: string
@@ -59,8 +60,8 @@ export default function RedefinirSenhaPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-8">
-        <div className="text-center space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">Toque Aquela</h1>
+        <div className="flex flex-col items-center space-y-2">
+          <Brand size="lg" />
           <p className="text-sm text-zinc-400">Defina uma nova senha</p>
         </div>
 

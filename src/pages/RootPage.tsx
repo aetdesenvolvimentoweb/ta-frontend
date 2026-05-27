@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom'
+import { Brand } from '@/components/Brand'
 
 export default function RootPage() {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <header className="flex items-center justify-between px-6 py-4 border-b border-zinc-900">
-        <span className="font-bold tracking-tight">Toque Aquela</span>
+        <Brand size="md" />
         <Link
           to="/artista/login"
           className="text-sm text-zinc-400 hover:text-white transition-colors"

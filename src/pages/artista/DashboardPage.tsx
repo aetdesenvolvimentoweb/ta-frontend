@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type { ActiveShow, ArtistMetrics, ArtistSong, ShowRequest } from '@/api/types'
+import { Brand } from '@/components/Brand'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -44,7 +45,7 @@ export default function DashboardPage() {
 function TopBar({ onLogout }: { onLogout: () => void }) {
   return (
     <header className="flex items-center justify-between px-4 py-4 border-b border-zinc-800">
-      <span className="font-semibold text-sm">Toque Aquela</span>
+      <Brand size="sm" />
       <div className="flex items-center gap-4">
         <Link
           to="/artista/repertorio"

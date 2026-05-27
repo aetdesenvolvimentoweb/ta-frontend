@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type { AppMetrics, MergeStylesRequest, Style } from '@/api/types'
+import { Brand } from '@/components/Brand'
 import { useToast } from '@/components/Toast'
 
 type Tab = 'metricas' | 'estilos'
@@ -41,9 +42,9 @@ export default function AdminPage() {
 function Header({ onLogout }: { onLogout: () => void }) {
   return (
     <header className="flex items-center justify-between px-4 py-4 border-b border-zinc-800">
-      <div>
-        <span className="font-semibold text-sm">Toque Aquela</span>
-        <span className="ml-2 px-1.5 py-0.5 rounded text-xs bg-amber-900/60 border border-amber-800 text-amber-400 font-semibold">
+      <div className="flex items-center gap-2">
+        <Brand size="sm" />
+        <span className="px-1.5 py-0.5 rounded text-xs bg-amber-900/60 border border-amber-800 text-amber-400 font-semibold">
           Admin
         </span>
       </div>
