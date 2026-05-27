@@ -9,6 +9,8 @@ export default function CadastroPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+  const [confirmError, setConfirmError] = useState<string | null>(null)
 
   const mutation = useMutation<RegisterResponse, ApiError, RegisterRequest>({
     mutationFn: (body) => api.post<RegisterResponse>('/v1/artists', body),
@@ -24,6 +26,11 @@ export default function CadastroPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    if (password !== passwordConfirm) {
+      setConfirmError('As senhas não conferem.')
+      return
+    }
+    setConfirmError(null)
     mutation.mutate({ name: name.trim(), email: email.trim(), password })
   }
 
@@ -77,7 +84,10 @@ export default function CadastroPage() {
               id="cadastro-senha"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (confirmError) setConfirmError(null)
+              }}
               placeholder="Mínimo 12 caracteres"
               className="input"
               minLength={12}
@@ -86,6 +96,27 @@ export default function CadastroPage() {
             />
           </div>
 
+          <div className="space-y-1.5">
+            <label htmlFor="cadastro-senha-confirm" className="text-xs font-medium text-zinc-400">
+              Confirme a senha
+            </label>
+            <input
+              id="cadastro-senha-confirm"
+              type="password"
+              value={passwordConfirm}
+              onChange={(e) => {
+                setPasswordConfirm(e.target.value)
+                if (confirmError) setConfirmError(null)
+              }}
+              placeholder="Repita a senha"
+              className="input"
+              minLength={12}
+              required
+              autoComplete="new-password"
+            />
+          </div>
+
+          {confirmError && <p className="text-red-400 text-sm">{confirmError}</p>}
           {mutation.isError && <p className="text-red-400 text-sm">{mutation.error?.message}</p>}
 
           <button
