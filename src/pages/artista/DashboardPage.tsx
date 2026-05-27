@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { type ApiError, api } from '@/api/client'
 import type { ActiveShow, ArtistMetrics, ArtistSong, ShowRequest } from '@/api/types'
 import { Brand } from '@/components/Brand'
+import { InstallPrompt } from '@/components/InstallPrompt'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -26,7 +27,8 @@ export default function DashboardPage() {
       <div className="max-w-lg mx-auto">
         <TopBar onLogout={handleLogout} />
 
-        <div className="px-4 pb-20">
+        <div className="px-4 pb-20 space-y-4 pt-4">
+          <InstallPrompt />
           {showLoading ? (
             <LoadingSpinner />
           ) : show ? (
@@ -149,7 +151,7 @@ function ActiveShowView({
   const played = requests.filter((r) => r.status === 'played')
 
   return (
-    <div className="space-y-6 pt-4">
+    <div className="space-y-6">
       {/* Cabeçalho do show */}
       <div className="flex items-center justify-between">
         <div>
